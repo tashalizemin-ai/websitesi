@@ -66,68 +66,59 @@
 
 <script>
 (async () => {
-  // --------- Ayarlar ----------
-  const OWNER = "tashalizemin-ai";
-  const REPO  = "websitesi";
+  const OWNER  = "tashalizemin-ai";
+  const REPO   = "websitesi";
+  const BRANCH = "main";
 
-  // Resimleri arayacağımız klasörler (olanı bulunca durur)
-  // Türkçe 'ı' / 'i' farkları ve eski 'assets' için yedekler eklendi.
-  const CANDIDATE_DIRS = [
-    "varlıklar", "varlıklar/fotograf",
-    "varliklar", "varliklar/fotograf",
-    "fotograf", "assets"
-  ];
-
-  const gridEl = document.getElementById("grid");
+  const gridEl   = document.getElementById("grid");
   const statusEl = document.getElementById("status");
 
-  function detectCat(pathLower, nameLower){
-    const s = (pathLower + " " + nameLower);
-    const isTas   = /(t[aâ]ş.?hal[ıi]|stone.?carpet|resin( |-)?bound|aggregate|gravel|pebble|drive|driveway|bahce|bahçe|zemin|floor)/i.test(s);
-    const isCephe = /(mekanik|mechanic|facade|façade|cladding|cephe|kompozit|compact|hpl|siding|aluco)/i.test(s);
-    if (isTas && !isCephe) return "tashali";
-    if (isCephe && !isTas) return "cephe";
-    if (/tashali|tas.?hali|tas-hali/.test(pathLower)) return "tashali";
-    if (/cephe|facade|cladding/.test(pathLower))      return "cephe";
-    return "tashali"; // ipucu yoksa varsayılan
-  }
-
-  async function tryList(dir){
-    const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURI(dir)}`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const json = await res.json();
-    // yalnız görüntü dosyaları
-    return json.filter(x => x.type === "file" && /\.(jpe?g|png|webp)$/i.test(x.name))
-               .map(x => ({
-                 src: x.download_url,
-                 name: x.name,
-                 dir
-               }));
-  }
-
-  // Sırayla klasörleri dene, ilk bulunanı kullan
-  let files = [];
-  for (const d of CANDIDATE_DIRS) {
-    try {
-      const list = await tryList(d);
-      if (list && list.length) { files = list; break; }
-    } catch {}
-  }
-
-  if (!files.length) {
-    statusEl.textContent = "Hiç görsel bulunamadı. Lütfen resimleri 'varlıklar' (veya 'varliklar') klasörüne yükleyin.";
+  // Reponun TÜM ağaç yapısını çek (recursive=1) → tüm dosyalar gelir
+  const treeURL = `https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`;
+  let tree;
+  try {
+    const res = await fetch(treeURL);
+    tree = await res.json();
+  } catch (e) {
+    statusEl.textContent = "Görseller alınamadı (ağ/erişim hatası).";
     return;
   }
 
-  // Kategori ata
-  files = files.map(f => {
-    const cat = detectCat((f.dir + "/" + f.name).toLowerCase(), f.name.toLowerCase());
-    return {...f, cat};
-  });
+  if (!tree || !Array.isArray(tree.tree)) {
+    statusEl.textContent = "Görsel listesi bulunamadı.";
+    return;
+  }
+
+  // Yalnız görselleri süz
+  const files = tree.tree
+    .filter(n => n.type === "blob" && /\.(jpe?g|png|webp)$/i.test(n.path))
+    .map(n => {
+      const pathEncoded = n.path.split("/").map(encodeURIComponent).join("/");
+      const src = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${pathEncoded}`;
+      return { path: n.path, name: n.path.split("/").pop(), src };
+    });
+
+  if (!files.length) {
+    statusEl.textContent = "Reponuzda .jpg/.png/.webp dosyası bulunamadı.";
+    return;
+  }
+
+  // Kategori tespiti
+  function detectCat(p) {
+    const s = p.toLowerCase();
+    const tas   = /(t[aâ]ş.?hal[ıi]|stone.?carpet|resin( |-)?bound|aggregate|gravel|pebble|drive|driveway|bahce|bahçe|zemin|floor)/i.test(s);
+    const cephe = /(mekanik|mechanic|facade|façade|cladding|cephe|kompozit|compact|hpl|siding|aluco)/i.test(s);
+    if (tas && !cephe)  return "tashali";
+    if (cephe && !tas)  return "cephe";
+    if (/tashali|tas.?hali|tas-hali/.test(s)) return "tashali";
+    if (/cephe|facade|cladding/.test(s))      return "cephe";
+    return "tashali";
+  }
+
+  const items = files.map(f => ({...f, cat: detectCat(f.path)}));
 
   // Render
-  gridEl.innerHTML = files.map(f => `
+  gridEl.innerHTML = items.map(f => `
     <figure class="card" data-cat="${f.cat}">
       <img loading="lazy" src="${f.src}" alt="${f.cat === 'tashali' ? 'Taş Halı' : 'Mekanik Cephe'}">
       <figcaption class="badge">${f.cat === 'tashali' ? 'Taş Halı' : 'Mekanik Cephe'}</figcaption>
@@ -148,7 +139,6 @@
       });
     });
   });
-
 })();
 </script>
 </body>
