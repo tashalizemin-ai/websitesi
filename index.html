@@ -3,46 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aka Yapı - Taş Halı & Mekanik Cephe</title>
-  <meta name="description" content="Profesyonel taş halı ve mekanik cephe uygulamalarıyla mekanlarınıza değer katıyoruz.">
+  <title>Aka Yapı – Mekanik Cephe & Taş Halı Zemin</title>
+  <meta name="description" content="İzmir ve Ege bölgesinde mekanik cephe kaplama, taş halı zemin uygulaması. Usta ekip, şeffaf fiyat, zamanında teslim.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { background: #f8f9fa; color: #333; }
-    header { background: #222; color: #fff; padding: 20px; text-align: center; }
-    header h1 { font-size: 28px; margin-bottom: 5px; }
-    header p { font-size: 16px; color: #ccc; }
-    section { padding: 40px 20px; max-width: 1100px; margin: auto; }
-    h2 { font-size: 24px; margin-bottom: 20px; color: #222; }
-    p { font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
-    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-    .gallery img { width: 100%; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    footer { background: #222; color: #fff; padding: 20px; text-align: center; margin-top: 40px; }
-    footer a { color: #ffcc00; text-decoration: none; }
+    body {margin:0; font-family:'Inter',sans-serif; line-height:1.6; background:#fff; color:#222;}
+    header {background:#111; color:#fff; padding:20px; text-align:center;}
+    header h1{margin:0; font-size:28px;}
+    header p{margin:5px 0 0; font-size:16px;}
+
+    section{max-width:1000px; margin:40px auto; padding:0 20px;}
+    h2{font-size:22px; margin-bottom:16px; color:#111;}
+
+    /* Galeri */
+    .gallery{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px;}
+    .gallery img{width:100%; height:240px; object-fit:cover; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.12); cursor:pointer;}
+    @media(max-width:900px){.gallery{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:600px){.gallery{grid-template-columns:1fr;}}
+
+    /* Lightbox */
+    .lightbox{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.9); z-index:9999;}
+    .lightbox img{max-width:95vw; max-height:90vh; border-radius:8px;}
+    .lightbox.show{display:flex;}
+
+    footer{background:#111; color:#fff; text-align:center; padding:20px;}
+    footer a{color:#ffcc00; text-decoration:none;}
   </style>
 </head>
 <body>
+
   <header>
     <h1>Aka Yapı</h1>
-    <p>Taş Halı Zemin & Mekanik Cephe Sistemleri</p>
+    <p>Taş Halı Zemin &amp; Mekanik Cephe Sistemleri</p>
   </header>
 
-  <section>
+  <section id="hakkimizda">
     <h2>Hakkımızda</h2>
-    <p>Profesyonel taş halı ve mekanik cephe uygulamalarıyla mekanlarınıza değer katıyoruz. Usta ekip, şeffaf fiyat politikası ve zamanında teslim anlayışımızla güveninizi kazanıyoruz.</p>
+    <p>Profesyonel taş halı ve mekanik cephe uygulamalarıyla mekanlarınıza değer katıyoruz. 
+       Usta ekip, şeffaf fiyat politikası ve zamanında teslim anlayışımızla güveninizi kazanıyoruz.</p>
   </section>
 
-  <section>
+  <section id="galeri">
     <h2>Fotoğraf Galerisi</h2>
     <div class="gallery">
-      <img src="https://via.placeholder.com/400x250?text=Mekanik+Cephe" alt="Mekanik Cephe">
-      <img src="https://via.placeholder.com/400x250?text=Taş+Halı+Zemin" alt="Taş Halı Zemin">
-      <img src="https://via.placeholder.com/400x250?text=Proje+Uygulaması" alt="Proje Uygulaması">
+      <img src="assets/cephe1.jpg" alt="Mekanik Cephe">
+      <img src="assets/tashali1.jpg" alt="Taş Halı Zemin">
+      <img src="assets/proje1.jpg" alt="Proje Uygulaması">
     </div>
+    <div class="lightbox" id="lb"><img src="" alt="Büyük görsel"></div>
   </section>
 
   <footer>
-    📞 0507 764 47 21 | 📧 <a href="mailto:info@akayapi.com">info@akayapi.com</a>
+    <p>📞 0507 764 47 21 | 📧 <a href="mailto:info@akayapi.com">info@akayapi.com</a></p>
+    <p>
+      <a href="https://wa.me/905077644721" target="_blank"
+         style="background:#25D366;color:#fff;padding:8px 14px;border-radius:8px;">
+        WhatsApp ile Teklif Al
+      </a>
+    </p>
   </footer>
+
+  <script>
+    document.querySelectorAll('.gallery img').forEach(img=>{
+      img.addEventListener('click',()=>{
+        const lb=document.getElementById('lb');
+        lb.querySelector('img').src=img.src;
+        lb.classList.add('show');
+      });
+    });
+    document.getElementById('lb').addEventListener('click', e=>{
+      e.currentTarget.classList.remove('show');
+    });
+  </script>
 </body>
 </html>
