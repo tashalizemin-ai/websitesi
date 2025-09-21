@@ -1,26 +1,34 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aka Yapı – Taş Halı & Mekanik Cephe</title>
   <meta name="description" content="Profesyonel taş halı ve mekanik cephe uygulamaları. Usta ekip, şeffaf fiyat, zamanında teslim.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {margin:0; font-family:'Inter',sans-serif; line-height:1.6; background:#fff; color:#222;}
-    header {background:#111; color:#fff; padding:20px; text-align:center;}
-    header h1 {margin:0; font-size:28px;}
-    header p {margin:6px 0 0;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:#fff;color:#222;line-height:1.6}
+    header{background:#111;color:#fff;text-align:center;padding:20px}
+    header h1{margin:0;font-size:28px}
+    header p{margin:6px 0 0}
+    section{max-width:1100px;margin:40px auto;padding:0 20px}
+    h2{font-size:22px;margin:0 0 16px;color:#111}
 
-    section {max-width:1000px; margin:40px auto; padding:0 20px;}
-    h2 {font-size:22px; margin-bottom:16px; color:#111;}
+    /* Galeri */
+    #gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+    .card{position:relative;border-radius:12px;overflow:hidden;background:#f6f6f6;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+    .card img{width:100%;height:240px;object-fit:cover;display:block}
+    .card figcaption{position:absolute;left:10px;bottom:10px;color:#fff;font-weight:600;text-shadow:0 2px 6px rgba(0,0,0,.6)}
 
-    .gallery {display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px;}
-    .gallery img {width:100%; height:240px; object-fit:cover; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.12);}
+    /* Lightbox */
+    .lb{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:9999}
+    .lb.show{display:flex}
+    .lb img{max-width:95vw;max-height:90vh;border-radius:10px}
 
-    footer {background:#111; color:#fff; text-align:center; padding:20px;}
-    footer a {color:#ffcc00; text-decoration:none;}
-    .whatsapp-btn {display:inline-block; margin-top:10px; padding:10px 16px; background:#25D366; color:#fff; border-radius:8px; text-decoration:none; font-weight:600;}
+    footer{background:#111;color:#fff;text-align:center;padding:20px}
+    footer a{color:#ffcc00;text-decoration:none}
+    .whatsapp{display:inline-block;margin-top:10px;background:#25D366;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600}
   </style>
 </head>
 <body>
@@ -29,28 +37,74 @@
     <p>Taş Halı Zemin &amp; Mekanik Cephe Sistemleri</p>
   </header>
 
-  <section id="hakkimizda">
+  <section>
     <h2>Hakkımızda</h2>
     <p>Profesyonel taş halı ve mekanik cephe uygulamalarıyla mekanlarınıza değer katıyoruz.
-       Usta ekip, şeffaf fiyat politikası ve zamanında teslim anlayışımızla güveninizi kazanıyoruz.</p>
+      Usta ekip, şeffaf fiyat politikası ve zamanında teslim anlayışımızla güveninizi kazanıyoruz.</p>
   </section>
 
-  <section id="galeri">
+  <section>
     <h2>Fotoğraf Galerisi</h2>
-    <div class="gallery">
-      <!-- Taş Halı -->
-      <img src="0f021ba9-8b98-4843-bc24-eed3c3bb153c.jpg" alt="Taş Halı Zemin">
-      <!-- Mekanik Cephe -->
-      <img src="03b08e08-5e50-4f28-b9cc-04392c45bb1f.jpg" alt="Mekanik Cephe Uygulaması">
-      <img src="935f3334-7e69-4fd2-a94d-a5ce43fd47aa.jpg" alt="Mekanik Cephe Uygulaması">
-      <img src="ea61d487-0e83-4686-acb4-a0da4a2724a7.jpg" alt="Mekanik Cephe Uygulaması">
-      <img src="d95c4fbd-701a-4aa1-8da1-c87603e4ca47.png" alt="Mekanik Cephe Uygulaması">
-    </div>
+    <div id="gallery"><div>Fotoğraflar yükleniyor…</div></div>
   </section>
+
+  <div class="lb" id="lb"><img alt=""></div>
 
   <footer>
     <p>📞 0507 764 47 21 | ✉️ <a href="mailto:info@akayapi.com">info@akayapi.com</a></p>
-    <a href="https://wa.me/905077644721" target="_blank" class="whatsapp-btn">WhatsApp ile Teklif Al</a>
+    <a class="whatsapp" href="https://wa.me/905077644721" target="_blank">WhatsApp ile Teklif Al</a>
   </footer>
+
+  <script>
+    // Bu repo bilgileri
+    const owner="tashalizemin-ai", repo="websitesi", branch="main";
+
+    // Şu klasörleri tara: kök + assets + varlıklar + fotoğraf (iki yazım da eklendi)
+    const folders=["","assets","varlıklar","varliklar","fotoğraf","fotograf"];
+
+    const exts=[".jpg",".jpeg",".png",".webp",".gif",".JPG",".JPEG",".PNG",".WEBP",".GIF"];
+    const gal=document.getElementById("gallery");
+    const seen=new Set();
+
+    function prettyName(s){ return s.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim(); }
+
+    function addCard(src,name){
+      if(seen.has(src)) return; seen.add(src);
+      const fig=document.createElement("figure"); fig.className="card";
+      const img=new Image(); img.loading="lazy"; img.src=src; img.alt=name;
+      const cap=document.createElement("figcaption"); cap.textContent=name;
+      fig.append(img,cap);
+      fig.onclick=()=>{const lb=document.getElementById("lb"); lb.querySelector("img").src=src; lb.classList.add("show");};
+      gal.append(fig);
+    }
+    document.getElementById("lb").onclick=e=>e.currentTarget.classList.remove("show");
+
+    async function list(path){
+      // Türkçe karakterli klasörler için encode gerekir
+      const encoded = path ? encodeURIComponent(path) : "";
+      const url=`https://api.github.com/repos/${owner}/${repo}/contents/${encoded}`;
+      const r=await fetch(url);
+      if(!r.ok) return [];
+      return r.json();
+    }
+
+    (async()=>{
+      gal.innerHTML="";
+      for(const f of folders){
+        try{
+          const items=await list(f);
+          items.forEach(it=>{
+            if(it.type==="file" && exts.some(ext=>it.name.endsWith(ext))){
+              const src = it.download_url || `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${it.path}`;
+              addCard(src, prettyName(it.name));
+            }
+          });
+        }catch(e){/* klasör yoksa sorun değil */}
+      }
+      if(!gal.children.length){
+        gal.innerHTML = "<div>Henüz görsel bulunamadı.</div>";
+      }
+    })();
+  </script>
 </body>
 </html>
