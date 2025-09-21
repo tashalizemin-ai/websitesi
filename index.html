@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -8,25 +7,27 @@
   <meta name="description" content="Profesyonel taş halı ve mekanik cephe uygulamaları. Usta ekip, şeffaf fiyat, zamanında teslim.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--gap:24px;--radius:14px}
+    :root{--gap:26px;--radius:14px}
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:#fff;color:#222;line-height:1.65}
     header{background:#111;color:#fff;text-align:center;padding:24px}
     header h1{margin:0;font-size:clamp(24px,3.2vw,36px)}
     header p{margin:8px 0 0;opacity:.9}
-
     section{max-width:1280px;margin:40px auto;padding:0 24px}
     h2{font-size:clamp(20px,2.2vw,26px);margin:0 0 16px;color:#111}
 
+    /* Filtre çipleri */
+    .filters{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 18px}
+    .chip{border:1px solid #ddd;background:#f7f7f7;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}
+    .chip.active{background:#111;color:#fff;border-color:#111}
+
     /* Galeri */
-    #gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--gap)}
-    @media(min-width:900px){
-      #gallery{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-    }
-    .card{position:relative;border-radius:var(--radius);overflow:hidden;background:#f6f6f6;box-shadow:0 8px 20px rgba(0,0,0,.12);transform:translateZ(0)}
-    .card img{width:100%;height:300px;object-fit:cover;display:block;transition:transform .35s ease}
+    #gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--gap)}
+    .card{position:relative;border-radius:var(--radius);overflow:hidden;background:#f6f6f6;
+      box-shadow:0 10px 24px rgba(0,0,0,.14);transform:translateZ(0)}
+    .card img{width:100%;height:320px;object-fit:cover;display:block;transition:transform .35s ease}
     .card:hover img{transform:scale(1.04)}
-    .card figcaption{position:absolute;left:12px;bottom:12px;color:#fff;font-weight:700;
+    .card figcaption{position:absolute;left:12px;bottom:12px;color:#fff;font-weight:800;
       text-shadow:0 3px 10px rgba(0,0,0,.7);font-size:14px;letter-spacing:.2px}
 
     /* Lightbox */
@@ -58,6 +59,14 @@
 
   <section>
     <h2>Fotoğraf Galerisi</h2>
+
+    <!-- Filtreler -->
+    <div class="filters">
+      <button class="chip active" data-cat="all">Hepsi</button>
+      <button class="chip" data-cat="tashali">Taş Halı</button>
+      <button class="chip" data-cat="cephe">Mekanik Cephe</button>
+    </div>
+
     <div id="gallery"><div>Fotoğraflar yükleniyor…</div></div>
     <div class="more-wrap"><button id="moreBtn" class="more" style="display:none">Daha Fazla Göster</button></div>
   </section>
@@ -71,19 +80,30 @@
 
   <script>
     const owner="tashalizemin-ai", repo="websitesi", branch="main";
-    // Kök + yaygın klasör adları (Türkçe/İngilizce) + 1 seviye alt klasör
-    const roots=["","assets","varlıklar","varliklar","fotoğraf","fotograf"];
+    const roots=["","assets","varlıklar","varliklar","fotoğraf","fotograf"]; // yaygın klasör adları
     const exts=[".jpg",".jpeg",".png",".webp",".gif",".JPG",".JPEG",".PNG",".WEBP",".GIF"];
-    const gal=document.getElementById("gallery"), seen=new Set();
+    const gal=document.getElementById("gallery"); const seen=new Set();
     const moreBtn=document.getElementById("moreBtn");
-    const CHUNK=24; let all=[], idx=0;
+    const CHUNK=24; let all=[], view=[], idx=0, current="all";
 
+    const chips=[...document.querySelectorAll(".chip")];
+    chips.forEach(c=>c.onclick=()=>{
+      chips.forEach(x=>x.classList.remove("active")); c.classList.add("active");
+      current=c.dataset.cat; applyFilter();
+    });
+
+    function detectCat(pathLower,nameLower){
+      const s=(pathLower+" "+nameLower);
+      if(/t[aâ]ş.?hal[ıi]|resin|stone|paving|driveway/i.test(s)) return "tashali";
+      if(/mekanik|mechanic|facade|façade|cladding|cephe/i.test(s)) return "cephe";
+      return "genel";
+    }
     function pretty(n){return n.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim()||"Çalışma"}
-    function addCard(src,name){
+    function addCard(src,name,cat){
       if(seen.has(src)) return; seen.add(src);
-      const fig=document.createElement("figure"); fig.className="card";
+      const fig=document.createElement("figure"); fig.className="card"; fig.dataset.cat=cat;
       const img=new Image(); img.loading="lazy"; img.src=src; img.alt=name;
-      const cap=document.createElement("figcaption"); cap.textContent=name;
+      const cap=document.createElement("figcaption"); cap.textContent=(cat==="tashali"?"Taş Halı":"Mekanik Cephe");
       fig.append(img,cap);
       fig.onclick=()=>{const lb=document.getElementById("lb"); lb.querySelector("img").src=src; lb.classList.add("show");};
       gal.append(fig);
@@ -109,25 +129,45 @@
       }catch(e){}
       return out;
     }
-    function renderMore(){
-      const end=Math.min(idx+CHUNK, all.length);
-      for(; idx<end; idx++){
-        const it=all[idx];
-        const src = it.download_url || `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${it.path}`;
-        addCard(src, pretty(it.name));
-      }
-      moreBtn.style.display = (idx<all.length) ? "inline-block" : "none";
-      moreBtn.disabled = !(idx<all.length);
-    }
-    (async()=>{
+
+    function applyFilter(){
       gal.innerHTML="";
-      for(const root of roots){ all = all.concat(await listRecursive(root)); }
-      // Aynı dosya adlarını temizle & isimce sırala
-      const seenPaths=new Set(); all = all.filter(it=>{ if(seenPaths.has(it.path)) return false; seenPaths.add(it.path); return true; })
-                                           .sort((a,b)=>a.name.localeCompare(b.name, "tr"));
-      if(!all.length){ gal.innerHTML="<div>Henüz görsel bulunamadı.</div>"; return; }
+      idx=0;
+      view = (current==="all") ? all : all.filter(it=>it._cat===current);
       renderMore();
       moreBtn.onclick=renderMore;
+    }
+    function renderMore(){
+      const end=Math.min(idx+CHUNK, view.length);
+      for(; idx<end; idx++){
+        const it=view[idx];
+        const src = it.download_url || `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${it.path}`;
+        addCard(src, pretty(it.name), it._cat==="tashali"?"tashali":"cephe");
+      }
+      moreBtn.style.display = (idx<view.length) ? "inline-block" : "none";
+      moreBtn.disabled = !(idx<view.length);
+    }
+
+    (async()=>{
+      gal.innerHTML="";
+      let raw=[];
+      for(const root of roots){ raw = raw.concat(await listRecursive(root)); }
+
+      // benzersiz + isimce sırala
+      const seenPaths=new Set();
+      raw = raw.filter(it=>{ if(seenPaths.has(it.path)) return false; seenPaths.add(it.path); return true; })
+               .sort((a,b)=>a.name.localeCompare(b.name,"tr"));
+
+      // kategori ata (dosya yolu ya da adı ile). Eğer klasörleri "varlıklar/tashali" ve "varlıklar/cephe"
+      // şeklinde ayırırsan tespit %100 net olur.
+      raw.forEach(it=>{
+        const p=it.path.toLowerCase(), n=it.name.toLowerCase();
+        it._cat = detectCat(p,n)==="tashali" ? "tashali" : "cephe"; // varsayılanı cephe tutuyoruz
+      });
+
+      all = raw;
+      if(!all.length){ gal.innerHTML="<div>Henüz görsel bulunamadı.</div>"; return; }
+      applyFilter();
     })();
   </script>
 </body>
