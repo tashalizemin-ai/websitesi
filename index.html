@@ -66,35 +66,37 @@
 
 <script>
 (async () => {
-  const OWNER  = "tashalizemin-ai";
-  const REPO   = "websitesi";
-  const BRANCH = "main";
+  // --- Repo adını ve sahip adını OTOMATİK algıla ---
+  const ownerFromHost = location.hostname.split(".")[0]; // tashalizemin-ai
+  const repoFromPath  = decodeURIComponent((location.pathname.split("/")[1] || "").trim()); // websitesi / web siteleri
+  const OWNER  = ownerFromHost || "tashalizemin-ai";
+  const REPO   = repoFromPath  || "websitesi";
+
+  // Dal ismi: önce main, olmazsa master dene
+  async function fetchTree(branch) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(OWNER)}/${encodeURIComponent(REPO)}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return res.json();
+  }
+  let tree = await fetchTree("main");
+  if (!tree || !Array.isArray(tree.tree)) tree = await fetchTree("master");
 
   const gridEl   = document.getElementById("grid");
   const statusEl = document.getElementById("status");
-
-  // Reponun TÜM ağaç yapısını çek (recursive=1) → tüm dosyalar gelir
-  const treeURL = `https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`;
-  let tree;
-  try {
-    const res = await fetch(treeURL);
-    tree = await res.json();
-  } catch (e) {
-    statusEl.textContent = "Görseller alınamadı (ağ/erişim hatası).";
-    return;
-  }
 
   if (!tree || !Array.isArray(tree.tree)) {
     statusEl.textContent = "Görsel listesi bulunamadı.";
     return;
   }
 
-  // Yalnız görselleri süz
+  // Yalnız görseller
+  const branch = tree.sha ? "main" : "master"; // görüntü URL'i için tahmini
   const files = tree.tree
     .filter(n => n.type === "blob" && /\.(jpe?g|png|webp)$/i.test(n.path))
     .map(n => {
-      const pathEncoded = n.path.split("/").map(encodeURIComponent).join("/");
-      const src = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${pathEncoded}`;
+      const encPath = n.path.split("/").map(encodeURIComponent).join("/");
+      const src = `https://raw.githubusercontent.com/${encodeURIComponent(OWNER)}/${encodeURIComponent(REPO)}/${branch}/${encPath}`;
       return { path: n.path, name: n.path.split("/").pop(), src };
     });
 
