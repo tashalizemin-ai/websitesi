@@ -7,44 +7,34 @@
   <meta name="description" content="Profesyonel taş halı ve mekanik cephe uygulamaları. Usta ekip, şeffaf fiyat, zamanında teslim.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--gap:26px;--radius:14px}
+    :root { --bg:#111; --text:#222; --muted:#666; --chip:#f5f5f5; --chipA:#111; --chipAT:#fff; }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:#fff;color:#222;line-height:1.65}
-    header{background:#111;color:#fff;text-align:center;padding:24px}
-    header h1{margin:0;font-size:clamp(24px,3.2vw,36px)}
-    header p{margin:8px 0 0;opacity:.9}
-    section{max-width:1280px;margin:40px auto;padding:0 24px}
-    h2{font-size:clamp(20px,2.2vw,26px);margin:0 0 16px;color:#111}
-
-    .filters{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 18px}
-    .chip{border:1px solid #ddd;background:#f7f7f7;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer}
-    .chip.active{background:#111;color:#fff;border-color:#111}
-
-    #gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--gap)}
-    .card{position:relative;border-radius:var(--radius);overflow:hidden;background:#f6f6f6;
-      box-shadow:0 10px 24px rgba(0,0,0,.14);transform:translateZ(0)}
-    .card img{width:100%;height:320px;object-fit:cover;display:block;transition:transform .35s ease}
-    .card:hover img{transform:scale(1.04)}
-    .card figcaption{position:absolute;left:12px;bottom:12px;color:#fff;font-weight:800;
-      text-shadow:0 3px 10px rgba(0,0,0,.7);font-size:14px;letter-spacing:.2px}
-
-    .lb{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:9999}
-    .lb.show{display:flex}
-    .lb img{max-width:95vw;max-height:90vh;border-radius:12px}
-
-    .more-wrap{display:flex;justify-content:center;margin-top:26px}
-    .more{background:#111;color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;font-weight:700}
-    .more:disabled{opacity:.5;cursor:not-allowed}
-
-    footer{background:#111;color:#fff;text-align:center;padding:24px;margin-top:40px}
+    body{margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;color:var(--text);background:#fff;line-height:1.6}
+    header{background:var(--bg);color:#fff;padding:22px 16px;text-align:center}
+    header h1{margin:0 0 4px 0;font-size:28px}
+    header p{margin:0;font-size:14px;opacity:.9}
+    section{max-width:1000px;margin:38px auto;padding:0 20px}
+    h2{font-size:22px;margin:0 0 16px 0}
+    .chips{display:flex;gap:8px;margin:10px 0 18px 0;flex-wrap:wrap}
+    .chip{background:var(--chip);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;border:1px solid #e9e9e9}
+    .chip.active{background:var(--chipA);color:var(--chipAT);border-color:var(--chipA)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+    .card{position:relative;border-radius:14px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.08)}
+    .card img{width:100%;height:200px;object-fit:cover;display:block}
+    .badge{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.62);color:#fff;padding:6px 10px;border-radius:999px;font-size:12px}
+    footer{background:var(--bg);color:#fff;text-align:center;padding:20px}
     footer a{color:#ffcc00;text-decoration:none}
-    .whatsapp{display:inline-block;margin-top:10px;background:#25D366;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600}
+    .wa{display:inline-block;margin-top:10px;background:#25D366;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600}
+    .muted{color:var(--muted);font-size:14px}
+    .center{display:flex;align-items:center;justify-content:center}
+    .spinner{border:3px solid #eee;border-top:3px solid #999;border-radius:50%;width:26px;height:26px;animation:sp 1s linear infinite;margin-right:10px}
+    @keyframes sp{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
   <header>
     <h1>Aka Yapı</h1>
-    <p>Taş Halı Zemin &amp; Mekanik Cephe Sistemleri</p>
+    <p>Taş Halı Zemin & Mekanik Cephe Sistemleri</p>
   </header>
 
   <section>
@@ -53,113 +43,113 @@
       Usta ekip, şeffaf fiyat politikası ve zamanında teslim anlayışımızla güveninizi kazanıyoruz.</p>
   </section>
 
-  <section>
+  <section id="galeri">
     <h2>Fotoğraf Galerisi</h2>
-    <div class="filters">
-      <button class="chip active" data-cat="all">Hepsi</button>
-      <button class="chip" data-cat="tashali">Taş Halı</button>
-      <button class="chip" data-cat="cephe">Mekanik Cephe</button>
+
+    <div class="chips">
+      <button class="chip active" data-filter="all">Hepsi</button>
+      <button class="chip" data-filter="tashali">Taş Halı</button>
+      <button class="chip" data-filter="cephe">Mekanik Cephe</button>
     </div>
 
-    <div id="gallery"><div>Fotoğraflar yükleniyor…</div></div>
-    <div class="more-wrap"><button id="moreBtn" class="more" style="display:none">Daha Fazla Göster</button></div>
-  </section>
+    <div id="status" class="center muted" style="margin:16px 0;">
+      <div class="spinner"></div> Görseller yükleniyor…
+    </div>
 
-  <div class="lb" id="lb"><img alt=""></div>
+    <div id="grid" class="grid" hidden></div>
+  </section>
 
   <footer>
     <p>📞 0507 764 47 21 | ✉️ <a href="mailto:info@akayapi.com">info@akayapi.com</a></p>
-    <a class="whatsapp" href="https://wa.me/905077644721" target="_blank">WhatsApp ile Teklif Al</a>
+    <a class="wa" href="https://wa.me/905077644721" target="_blank">WhatsApp ile Teklif Al</a>
   </footer>
 
-  <script>
-    const owner="tashalizemin-ai", repo="websitesi", branch="main";
-    const roots=["","assets","varlıklar","varliklar","fotoğraf","fotograf"];
-    const exts=[".jpg",".jpeg",".png",".webp",".gif",".JPG",".JPEG",".PNG",".WEBP",".GIF"];
-    const gal=document.getElementById("gallery"), seen=new Set();
-    const moreBtn=document.getElementById("moreBtn");
-    const CHUNK=24; let all=[], view=[], idx=0, current="all";
+<script>
+(async () => {
+  // --------- Ayarlar ----------
+  const OWNER = "tashalizemin-ai";
+  const REPO  = "websitesi";
 
-    const chips=[...document.querySelectorAll(".chip")];
-    chips.forEach(c=>c.onclick=()=>{
-      chips.forEach(x=>x.classList.remove("active")); c.classList.add("active");
-      current=c.dataset.cat; applyFilter();
-    });
+  // Resimleri arayacağımız klasörler (olanı bulunca durur)
+  // Türkçe 'ı' / 'i' farkları ve eski 'assets' için yedekler eklendi.
+  const CANDIDATE_DIRS = [
+    "varlıklar", "varlıklar/fotograf",
+    "varliklar", "varliklar/fotograf",
+    "fotograf", "assets"
+  ];
 
-    function detectCat(pathLower,nameLower){
-      const s=(pathLower+" "+nameLower);
-      if(/t[aâ]ş.?hal[ıi]|resin|stone|paving|driveway/i.test(s)) return "tashali";
-      if(/mekanik|mechanic|facade|façade|cladding|cephe/i.test(s)) return "cephe";
-      return "genel";
-    }
-    function pretty(n){return n.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim()||"Çalışma"}
-    function addCard(src,name,cat){
-      if(seen.has(src)) return; seen.add(src);
-      const fig=document.createElement("figure"); fig.className="card"; fig.dataset.cat=cat;
-      const img=new Image(); img.loading="lazy"; img.src=src; img.alt=name;
-      const cap=document.createElement("figcaption"); cap.textContent=(cat==="tashali"?"Taş Halı":"Mekanik Cephe");
-      fig.append(img,cap);
-      fig.onclick=()=>{const lb=document.getElementById("lb"); lb.querySelector("img").src=src; lb.classList.add("show");};
-      gal.append(fig);
-    }
-    document.getElementById("lb").onclick=e=>e.currentTarget.classList.remove("show");
-    window.addEventListener("keydown",e=>{ if(e.key==="Escape") document.getElementById("lb").classList.remove("show"); });
+  const gridEl = document.getElementById("grid");
+  const statusEl = document.getElementById("status");
 
-    async function list(path){
-      const encoded = path ? encodeURI(path) : "";
-      const r=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encoded}`);
-      if(!r.ok) return []; return r.json();
-    }
-    async function listRecursive(base){
-      const out=[]; try{
-        const items=await list(base);
-        for(const it of items){
-          if(it.type==="file" && exts.some(ext=>it.name.endsWith(ext))) out.push(it);
-          if(it.type==="dir"){
-            const sub=await list(base?`${base}/${it.name}`:it.name);
-            sub.forEach(s=>{ if(s.type==="file" && exts.some(ext=>s.name.endsWith(ext))) out.push(s); });
-          }
-        }
-      }catch(e){}
-      return out;
-    }
+  function detectCat(pathLower, nameLower){
+    const s = (pathLower + " " + nameLower);
+    const isTas   = /(t[aâ]ş.?hal[ıi]|stone.?carpet|resin( |-)?bound|aggregate|gravel|pebble|drive|driveway|bahce|bahçe|zemin|floor)/i.test(s);
+    const isCephe = /(mekanik|mechanic|facade|façade|cladding|cephe|kompozit|compact|hpl|siding|aluco)/i.test(s);
+    if (isTas && !isCephe) return "tashali";
+    if (isCephe && !isTas) return "cephe";
+    if (/tashali|tas.?hali|tas-hali/.test(pathLower)) return "tashali";
+    if (/cephe|facade|cladding/.test(pathLower))      return "cephe";
+    return "tashali"; // ipucu yoksa varsayılan
+  }
 
-    function applyFilter(){
-      gal.innerHTML="";
-      idx=0;
-      view = (current==="all") ? all : all.filter(it=>it._cat===current);
-      renderMore();
-      moreBtn.onclick=renderMore;
-    }
-    function renderMore(){
-      const end=Math.min(idx+CHUNK, view.length);
-      for(; idx<end; idx++){
-        const it=view[idx];
-        const src = it.download_url || `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${it.path}`;
-        addCard(src, pretty(it.name), it._cat==="tashali"?"tashali":"cephe");
-      }
-      moreBtn.style.display = (idx<view.length) ? "inline-block" : "none";
-      moreBtn.disabled = !(idx<view.length);
-    }
+  async function tryList(dir){
+    const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURI(dir)}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const json = await res.json();
+    // yalnız görüntü dosyaları
+    return json.filter(x => x.type === "file" && /\.(jpe?g|png|webp)$/i.test(x.name))
+               .map(x => ({
+                 src: x.download_url,
+                 name: x.name,
+                 dir
+               }));
+  }
 
-    (async()=>{
-      gal.innerHTML="";
-      let raw=[];
-      for(const root of roots){ raw = raw.concat(await listRecursive(root)); }
+  // Sırayla klasörleri dene, ilk bulunanı kullan
+  let files = [];
+  for (const d of CANDIDATE_DIRS) {
+    try {
+      const list = await tryList(d);
+      if (list && list.length) { files = list; break; }
+    } catch {}
+  }
 
-      const seenPaths=new Set();
-      raw = raw.filter(it=>{ if(seenPaths.has(it.path)) return false; seenPaths.add(it.path); return true; })
-               .sort((a,b)=>a.name.localeCompare(b.name,"tr"));
+  if (!files.length) {
+    statusEl.textContent = "Hiç görsel bulunamadı. Lütfen resimleri 'varlıklar' (veya 'varliklar') klasörüne yükleyin.";
+    return;
+  }
 
-      raw.forEach(it=>{
-        const p=it.path.toLowerCase(), n=it.name.toLowerCase();
-        it._cat = detectCat(p,n)==="tashali" ? "tashali" : "cephe";
+  // Kategori ata
+  files = files.map(f => {
+    const cat = detectCat((f.dir + "/" + f.name).toLowerCase(), f.name.toLowerCase());
+    return {...f, cat};
+  });
+
+  // Render
+  gridEl.innerHTML = files.map(f => `
+    <figure class="card" data-cat="${f.cat}">
+      <img loading="lazy" src="${f.src}" alt="${f.cat === 'tashali' ? 'Taş Halı' : 'Mekanik Cephe'}">
+      <figcaption class="badge">${f.cat === 'tashali' ? 'Taş Halı' : 'Mekanik Cephe'}</figcaption>
+    </figure>
+  `).join("");
+
+  statusEl.hidden = true;
+  gridEl.hidden = false;
+
+  // Filtreler
+  document.querySelectorAll(".chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      const f = chip.dataset.filter;
+      document.querySelectorAll(".card").forEach(card => {
+        card.style.display = (f === "all" || card.dataset.cat === f) ? "" : "none";
       });
+    });
+  });
 
-      all = raw;
-      if(!all.length){ gal.innerHTML="<div>Henüz görsel bulunamadı.</div>"; return; }
-      applyFilter();
-    })();
-  </script>
+})();
+</script>
 </body>
 </html>
