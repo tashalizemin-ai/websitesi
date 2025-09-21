@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -7,26 +8,38 @@
   <meta name="description" content="Profesyonel taş halı ve mekanik cephe uygulamaları. Usta ekip, şeffaf fiyat, zamanında teslim.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    :root{--gap:24px;--radius:14px}
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:#fff;color:#222;line-height:1.6}
-    header{background:#111;color:#fff;text-align:center;padding:20px}
-    header h1{margin:0;font-size:28px}
-    header p{margin:6px 0 0}
-    section{max-width:1100px;margin:40px auto;padding:0 20px}
-    h2{font-size:22px;margin:0 0 16px;color:#111}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:#fff;color:#222;line-height:1.65}
+    header{background:#111;color:#fff;text-align:center;padding:24px}
+    header h1{margin:0;font-size:clamp(24px,3.2vw,36px)}
+    header p{margin:8px 0 0;opacity:.9}
+
+    section{max-width:1280px;margin:40px auto;padding:0 24px}
+    h2{font-size:clamp(20px,2.2vw,26px);margin:0 0 16px;color:#111}
 
     /* Galeri */
-    #gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
-    .card{position:relative;border-radius:12px;overflow:hidden;background:#f6f6f6;box-shadow:0 4px 10px rgba(0,0,0,.12)}
-    .card img{width:100%;height:240px;object-fit:cover;display:block}
-    .card figcaption{position:absolute;left:10px;bottom:10px;color:#fff;font-weight:600;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+    #gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--gap)}
+    @media(min-width:900px){
+      #gallery{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+    }
+    .card{position:relative;border-radius:var(--radius);overflow:hidden;background:#f6f6f6;box-shadow:0 8px 20px rgba(0,0,0,.12);transform:translateZ(0)}
+    .card img{width:100%;height:300px;object-fit:cover;display:block;transition:transform .35s ease}
+    .card:hover img{transform:scale(1.04)}
+    .card figcaption{position:absolute;left:12px;bottom:12px;color:#fff;font-weight:700;
+      text-shadow:0 3px 10px rgba(0,0,0,.7);font-size:14px;letter-spacing:.2px}
 
     /* Lightbox */
     .lb{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:9999}
     .lb.show{display:flex}
-    .lb img{max-width:95vw;max-height:90vh;border-radius:10px}
+    .lb img{max-width:95vw;max-height:90vh;border-radius:12px}
 
-    footer{background:#111;color:#fff;text-align:center;padding:20px}
+    /* Daha Fazla butonu */
+    .more-wrap{display:flex;justify-content:center;margin-top:26px}
+    .more{background:#111;color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;font-weight:700}
+    .more:disabled{opacity:.5;cursor:not-allowed}
+
+    footer{background:#111;color:#fff;text-align:center;padding:24px;margin-top:40px}
     footer a{color:#ffcc00;text-decoration:none}
     .whatsapp{display:inline-block;margin-top:10px;background:#25D366;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600}
   </style>
@@ -46,6 +59,7 @@
   <section>
     <h2>Fotoğraf Galerisi</h2>
     <div id="gallery"><div>Fotoğraflar yükleniyor…</div></div>
+    <div class="more-wrap"><button id="moreBtn" class="more" style="display:none">Daha Fazla Göster</button></div>
   </section>
 
   <div class="lb" id="lb"><img alt=""></div>
@@ -56,18 +70,15 @@
   </footer>
 
   <script>
-    // Bu repo bilgileri
     const owner="tashalizemin-ai", repo="websitesi", branch="main";
-
-    // Şu klasörleri tara: kök + assets + varlıklar + fotoğraf (iki yazım da eklendi)
-    const folders=["","assets","varlıklar","varliklar","fotoğraf","fotograf"];
-
+    // Kök + yaygın klasör adları (Türkçe/İngilizce) + 1 seviye alt klasör
+    const roots=["","assets","varlıklar","varliklar","fotoğraf","fotograf"];
     const exts=[".jpg",".jpeg",".png",".webp",".gif",".JPG",".JPEG",".PNG",".WEBP",".GIF"];
-    const gal=document.getElementById("gallery");
-    const seen=new Set();
+    const gal=document.getElementById("gallery"), seen=new Set();
+    const moreBtn=document.getElementById("moreBtn");
+    const CHUNK=24; let all=[], idx=0;
 
-    function prettyName(s){ return s.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim(); }
-
+    function pretty(n){return n.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim()||"Çalışma"}
     function addCard(src,name){
       if(seen.has(src)) return; seen.add(src);
       const fig=document.createElement("figure"); fig.className="card";
@@ -78,32 +89,45 @@
       gal.append(fig);
     }
     document.getElementById("lb").onclick=e=>e.currentTarget.classList.remove("show");
+    window.addEventListener("keydown",e=>{ if(e.key==="Escape") document.getElementById("lb").classList.remove("show"); });
 
     async function list(path){
-      // Türkçe karakterli klasörler için encode gerekir
-      const encoded = path ? encodeURIComponent(path) : "";
-      const url=`https://api.github.com/repos/${owner}/${repo}/contents/${encoded}`;
-      const r=await fetch(url);
-      if(!r.ok) return [];
-      return r.json();
+      const encoded = path ? encodeURI(path) : "";
+      const r=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encoded}`);
+      if(!r.ok) return []; return r.json();
     }
-
+    async function listRecursive(base){
+      const out=[]; try{
+        const items=await list(base);
+        for(const it of items){
+          if(it.type==="file" && exts.some(ext=>it.name.endsWith(ext))) out.push(it);
+          if(it.type==="dir"){ // 1 seviye alt klasör
+            const sub=await list(base?`${base}/${it.name}`:it.name);
+            sub.forEach(s=>{ if(s.type==="file" && exts.some(ext=>s.name.endsWith(ext))) out.push(s); });
+          }
+        }
+      }catch(e){}
+      return out;
+    }
+    function renderMore(){
+      const end=Math.min(idx+CHUNK, all.length);
+      for(; idx<end; idx++){
+        const it=all[idx];
+        const src = it.download_url || `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${it.path}`;
+        addCard(src, pretty(it.name));
+      }
+      moreBtn.style.display = (idx<all.length) ? "inline-block" : "none";
+      moreBtn.disabled = !(idx<all.length);
+    }
     (async()=>{
       gal.innerHTML="";
-      for(const f of folders){
-        try{
-          const items=await list(f);
-          items.forEach(it=>{
-            if(it.type==="file" && exts.some(ext=>it.name.endsWith(ext))){
-              const src = it.download_url || `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${it.path}`;
-              addCard(src, prettyName(it.name));
-            }
-          });
-        }catch(e){/* klasör yoksa sorun değil */}
-      }
-      if(!gal.children.length){
-        gal.innerHTML = "<div>Henüz görsel bulunamadı.</div>";
-      }
+      for(const root of roots){ all = all.concat(await listRecursive(root)); }
+      // Aynı dosya adlarını temizle & isimce sırala
+      const seenPaths=new Set(); all = all.filter(it=>{ if(seenPaths.has(it.path)) return false; seenPaths.add(it.path); return true; })
+                                           .sort((a,b)=>a.name.localeCompare(b.name, "tr"));
+      if(!all.length){ gal.innerHTML="<div>Henüz görsel bulunamadı.</div>"; return; }
+      renderMore();
+      moreBtn.onclick=renderMore;
     })();
   </script>
 </body>
