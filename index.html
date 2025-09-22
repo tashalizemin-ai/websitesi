@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -67,37 +66,34 @@
 
 <script>
 (async () => {
-  // --- Repo adını ve sahip adını OTOMATİK algıla ---
-  const ownerFromHost = location.hostname.split(".")[0]; // tashalizemin-ai
-  const repoFromPath  = decodeURIComponent((location.pathname.split("/")[1] || "").trim()); // websitesi / web siteleri
-  const OWNER  = ownerFromHost || "tashalizemin-ai";
-  const REPO   = repoFromPath  || "websitesi";
-
-  // Dal ismi: önce main, olmazsa master dene
-  async function fetchTree(branch) {
-    const url = `https://api.github.com/repos/${encodeURIComponent(OWNER)}/${encodeURIComponent(REPO)}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    return res.json();
-  }
-  let tree = await fetchTree("main");
-  if (!tree || !Array.isArray(tree.tree)) tree = await fetchTree("master");
+  const OWNER  = "tashalizemin-ai";
+  const REPO   = "websitesi";
+  const BRANCH = "main";
 
   const gridEl   = document.getElementById("grid");
   const statusEl = document.getElementById("status");
+
+  // Repo ağacını getir (tüm dosyalar)
+  let tree;
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1`);
+    tree = await res.json();
+  } catch {
+    statusEl.textContent = "Görseller alınamadı (ağ/erişim hatası).";
+    return;
+  }
 
   if (!tree || !Array.isArray(tree.tree)) {
     statusEl.textContent = "Görsel listesi bulunamadı.";
     return;
   }
 
-  // Yalnız görseller
-  const branch = tree.sha ? "main" : "master"; // görüntü URL'i için tahmini
+  // Yalnızca resimler
   const files = tree.tree
     .filter(n => n.type === "blob" && /\.(jpe?g|png|webp)$/i.test(n.path))
     .map(n => {
-      const encPath = n.path.split("/").map(encodeURIComponent).join("/");
-      const src = `https://raw.githubusercontent.com/${encodeURIComponent(OWNER)}/${encodeURIComponent(REPO)}/${branch}/${encPath}`;
+      const pathEncoded = n.path.split("/").map(encodeURIComponent).join("/");
+      const src = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${pathEncoded}`;
       return { path: n.path, name: n.path.split("/").pop(), src };
     });
 
@@ -106,7 +102,6 @@
     return;
   }
 
-  // Kategori tespiti
   function detectCat(p) {
     const s = p.toLowerCase();
     const tas   = /(t[aâ]ş.?hal[ıi]|stone.?carpet|resin( |-)?bound|aggregate|gravel|pebble|drive|driveway|bahce|bahçe|zemin|floor)/i.test(s);
@@ -120,7 +115,6 @@
 
   const items = files.map(f => ({...f, cat: detectCat(f.path)}));
 
-  // Render
   gridEl.innerHTML = items.map(f => `
     <figure class="card" data-cat="${f.cat}">
       <img loading="lazy" src="${f.src}" alt="${f.cat === 'tashali' ? 'Taş Halı' : 'Mekanik Cephe'}">
@@ -131,7 +125,6 @@
   statusEl.hidden = true;
   gridEl.hidden = false;
 
-  // Filtreler
   document.querySelectorAll(".chip").forEach(chip => {
     chip.addEventListener("click", () => {
       document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
